@@ -1,0 +1,9 @@
+{
+  "model": "",
+  "dict_size": "",
+  "train_data_path": "",
+  "eval_data_path": "",
+  "test_data_path": "",
+  "stop_word_path": "",
+  "output_path": ""
+}

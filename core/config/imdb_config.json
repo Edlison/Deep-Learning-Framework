@@ -1,0 +1,10 @@
+{
+  "model": "",
+  "dict_size": "1000",
+  "split_sign": "<SEP>",
+  "train_data_path": "../data/imdb/train_data.txt",
+  "eval_data_path": "../data/imdb/eval_data.txt",
+  "test_data_path": "../data/imdb/imdb_test.txt",
+  "stop_word_path": "../data/stopwords/stop_en.txt",
+  "output_path": "../output/imdb"
+}
