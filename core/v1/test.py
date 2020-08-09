@@ -17,6 +17,7 @@ class Tester:
         self.model = torch.load(model_path)
 
     def test(self):
+        self.model.eval()
         with torch.no_grad():
             res = []
             for X in self.test_iter:

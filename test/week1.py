@@ -16,7 +16,7 @@ def predict_imdb_test():
     clf = LogisticRegression()
     clf.fit(train_pow, p.train_y)
     pre = clf.predict(test_pow)
-    with open('../data/output/imdb_out_0.txt', 'w') as f:
+    with open('../data/output/week1/imdb_out_0.txt', 'w') as f:
         for i in pre:
             f.write(i + '\n')
 

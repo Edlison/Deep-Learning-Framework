@@ -1,7 +1,6 @@
 # @Author  : Edlison
 # @Date    : 7/29/20 22:59
 # Todo 通用类载入config
-# Todo trainLoader, (evalLoader, testLoader)继承Loader
 # Todo 记录参考参数avglen(sample), len(words_list)...
 
 from math import log10
@@ -258,7 +257,7 @@ class TestLoader(Loader):
         # 7. get data
 
     def get_data(self):
-        return DataLoader(TestDataset(self.samples), batch_size=self.batch_size, shuffle=True)
+        return DataLoader(TestDataset(self.samples), batch_size=self.batch_size)
 
     def read(self):
         ...
