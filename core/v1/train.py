@@ -4,6 +4,7 @@
 import torch
 from core.v1.model import Model
 import tqdm
+import time
 
 
 class Trainer:
@@ -19,37 +20,75 @@ class Trainer:
         self.optimizer = optimizer
         self.epoch = epoch
 
-    def eval(self, iter):
-        correct, loss_sum, num = 0, 0.0, 0
+    def _train(self, model, iter, optimizer, criterion):
+        epoch_loss, epoch_acc, total_len = 0, 0, 0
+        model.train()
+
+        for X, y in iter:
+            # 梯度清零
+            optimizer.zero_grad()
+            # 送入模型
+            outputs = model(X)
+            # 损失函数
+            loss = criterion(outputs, y)
+            # 准确率
+            acc = self._acc_num(outputs, y)
+            # 反向传播
+            loss.backward()
+            # 梯度下降
+            optimizer.step()
+
+            epoch_loss += loss
+            epoch_acc += acc
+            total_len += len(y)
+        print(total_len)
+        return epoch_loss / total_len, epoch_acc / total_len
+
+    def _eval(self, model, iter, criterion):
+        epoch_loss, epoch_acc, total_len = 0, 0, 0
+        model.eval()
+
         with torch.no_grad():
+            # 没有反向传播和梯度下降
             for X, y in iter:
-                outputs = self.model(X)
-                outputs_ = torch.argmax(outputs, dim=-1)
-                loss = self.criterion(outputs, y)
-                loss_sum += loss
-                correct += torch.sum(outputs_.eq(y)).float().item()
-                num += y.size()[0]
-        print(f'loss {loss_sum/num:.5f}, acc {correct/num:.5f}.')
+                outputs = model(X)
+                loss = criterion(outputs, y)
+                acc = self._acc_num(outputs, y)
+
+                epoch_loss += loss
+                epoch_acc += acc
+                total_len += len(y)
+
+        return epoch_loss / total_len, epoch_acc / total_len
 
     def start(self):
-        for i in tqdm.trange(self.epoch):
-            self.model.train()  # 训练模式
-            print(f'epoch {i} start')
-            for j, data in enumerate(self.train_iter):
-                (X, labels) = data
-                # print('before model X', X, X.shape)  # [500, 30], [500]
-                outputs = self.model(X)
-                # print('after model output', outputs, outputs.shape)  # [30, 2] -> [500, 2]
-                # print('after model labels', labels, labels.shape)  # [500]
-                loss = self.criterion(outputs, labels)
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
-            print('train set', end='\t')
-            self.eval(self.train_iter)
-            print('eval set', end='\t')
-            self.model.eval()
-            self.eval(self.eval_iter)
+        start = time.time()
+        for epoch in tqdm.trange(self.epoch):
+            epoch_start = time.time()
+            train_loss, train_acc = self._train(self.model, self.train_iter, self.optimizer, self.criterion)
+            eval_loss, eval_acc = self._eval(self.model, self.eval_iter, self.criterion)
+            epoch_end = time.time()
+
+            print(f'\nEpoch: {epoch + 1:02} | Epoch Time: {epoch_end - epoch_start:.2f}s')
+            print(f'\tTrain Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f}')
+            print(f'\tEval. Loss: {eval_loss:.4f} | Eval. Acc: {eval_acc:.4f}')
+        end = time.time()
+        print(f'\nTotal Train Time: {end - start:.2f}s')
+
+    def _acc_num(self, prediction, true):
+        """
+        dim = 1
+
+        Args:
+            prediction ():
+            true ():
+
+        Returns:
+
+        """
+        prediction = torch.argmax(prediction, dim=1)
+        acc = torch.sum(prediction.eq(true)).float().item()
+        return acc / len(true)
 
     def save_model(self, path):
         """
@@ -61,7 +100,6 @@ class Trainer:
         Returns:
 
         """
-        # path = '../data/cache/model/imdb.pt'
         torch.save(self.model, path)
 
     def eval_test(self, iter):  # withdraw

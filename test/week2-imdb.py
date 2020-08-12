@@ -1,6 +1,5 @@
 # @Author  : Edlison
 # @Date    : 7/29/20 23:27
-# TODO <pad>是一个随机生成的向量
 
 import torch
 from core.v1.pre import TrainLoader
@@ -103,11 +102,11 @@ class RNNModel(Model):
         self.embedding_layer.weight.requires_grad = False
 
         self.rnn = torch.nn.LSTM(word_dim, hidden_size, layer_num, batch_first=True)
-        # self.fc = torch.nn.Sequential(
-        #     torch.nn.Dropout(0.4),
-        #     torch.nn.Linear(hidden_size, output_num)
-        # )
-        self.fc = torch.nn.Linear(hidden_size, output_num)
+        self.fc = torch.nn.Sequential(
+            torch.nn.Dropout(0.4),
+            torch.nn.Linear(hidden_size, output_num)
+        )
+        # self.fc = torch.nn.Linear(hidden_size, output_num)
 
     def forward(self, X):
         # print('forward', X, X.shape)  # [500, 30]
@@ -186,17 +185,17 @@ if __name__ == '__main__':
     rnnModel = RNNModel(dict_size=dict_size,
                         word_dim=word_dim,
                         layer_num=1,
-                        hidden_size=256,
+                        hidden_size=128,
                         output_num=2)
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(rnnModel.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(rnnModel.parameters())
     print('- trainer exe start!')
     trainer = Trainer(train_iter=trainLoader.get_data(),
                       eval_iter=evalLoader.get_data(),
                       model=rnnModel,
                       criterion=criterion,
                       optimizer=optimizer,
-                      epoch=10)
+                      epoch=2)
     print('- trainer.start start!')
     trainer.start()
     print('- trainer save model start!')
