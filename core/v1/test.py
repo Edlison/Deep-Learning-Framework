@@ -1,7 +1,6 @@
 # @Author  : Edlison
 # @Date    : 8/4/20 00:46
 import torch
-import numpy as np
 
 
 class Tester:

@@ -129,22 +129,17 @@ class TrainLoader(Loader):
         self.batch_size = batch_size
         # 1. read
         self.read()
-        print('read completed!')
         # 2. clean
         self.clean()
-        print('clean completed!')
         # 3. rm stop words
         if rm_stop is not None:
             self.load_stop_words(rm_stop)
             self.rm_stop()
-            print('rm stop words completed!')
         # 4. generate dict
         dict_generator = DictGenerator(self.samples, dict_size, gen_dict_by)
         self.words_dict = dict_generator.get_dict()
-        print('generate dict completed!')
         # 5. words2seq
         self.words2seq(self.words_dict, features_size)
-        print('words2seq completed!')
         # 6. data2tensor
         self.data2tensor()
         # 7. get data
@@ -189,20 +184,16 @@ class EvalLoader(Loader):
         self.batch_size = batch_size
         # 1. read
         self.read()
-        print('read completed!')
         # 2. clean
         self.clean()
-        print('clean completed!')
         # 3. rm stop words
         if rm_stop is not None:
             self.load_stop_words(rm_stop)
             self.rm_stop()
-            print('rm stop words completed!')
         # 4. load dict
         self.load_dict(words_dict_path)
         # 5. words2seq
         self.words2seq(self.words_dict, features_size)
-        print('words2seq completed!')
         # 6. data2tensor
         self.data2tensor()
         # 7. get data
@@ -238,20 +229,16 @@ class TestLoader(Loader):
         self.batch_size = batch_size
         # 1. read
         self.read()
-        print('read completed!')
         # 2. clean
         self.clean()
-        print('clean completed!')
         # 3. rm stop words
         if rm_stop is not None:
             self.load_stop_words(rm_stop)
             self.rm_stop()
-            print('rm stop words completed!')
         # 4. load dict
         self.load_dict(words_dict_path)
         # 5. words2seq
         self.words2seq(self.words_dict, features_size)
-        print('words2seq completed!')
         # 6. data2tensor
         self.data2tensor()
         # 7. get data

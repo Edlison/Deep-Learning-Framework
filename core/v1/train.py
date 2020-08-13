@@ -41,7 +41,7 @@ class Trainer:
             epoch_loss += loss
             epoch_acc += acc
             total_len += len(y)
-        print(total_len)
+
         return epoch_loss / total_len, epoch_acc / total_len
 
     def _eval(self, model, iter, criterion):
@@ -88,7 +88,7 @@ class Trainer:
         """
         prediction = torch.argmax(prediction, dim=1)
         acc = torch.sum(prediction.eq(true)).float().item()
-        return acc / len(true)
+        return acc
 
     def save_model(self, path):
         """

@@ -101,10 +101,10 @@ class RNNModel(Model):
         self.embedding_layer.from_pretrained(torch.from_numpy(vecs))
         self.embedding_layer.weight.requires_grad = False
 
-        self.rnn = torch.nn.LSTM(word_dim, hidden_size, layer_num, batch_first=True)
+        self.rnn = torch.nn.LSTM(word_dim, hidden_size, layer_num, batch_first=True, bidirectional=True)
+        self.dropout = torch.nn.Dropout(0.5)
         self.fc = torch.nn.Sequential(
-            torch.nn.Dropout(0.4),
-            torch.nn.Linear(hidden_size, output_num)
+            torch.nn.Linear(hidden_size * 2, output_num)
         )
         # self.fc = torch.nn.Linear(hidden_size, output_num)
 
@@ -116,7 +116,9 @@ class RNNModel(Model):
         # outs, _ = self.rnn(X)  # 通过embedding层变为3d [batch, seq, wordvec]
         # outs = self.fc(outs[-1])
         outs, (hs, hc) = self.rnn(X)
-        outs = self.fc(outs[:, -1, :])
+        hidden = self.dropout(torch.cat((hs[-2, :, :], hs[-1, :, :]), dim=1))
+        outs = self.fc(hidden.squeeze())
+        # outs = self.fc(outs[:, -1, :])
         return outs
 
 
@@ -166,8 +168,6 @@ if __name__ == '__main__':
     model_path = '../data/cache/model/model.pt'
     test_labels_path = '../data/output/imdb_v1_out_2.txt'
 
-    time1 = time.time()
-
     print('- train loader exe start!')
     trainLoader = train_ImdbLoader(dict_size=dict_size,
                                    features_size=features_size,
@@ -195,7 +195,7 @@ if __name__ == '__main__':
                       model=rnnModel,
                       criterion=criterion,
                       optimizer=optimizer,
-                      epoch=2)
+                      epoch=30)
     print('- trainer.start start!')
     trainer.start()
     print('- trainer save model start!')
@@ -212,8 +212,6 @@ if __name__ == '__main__':
     tester.test()
     print('- labels export start!')
     tester.export(test_labels_path)
-    time2 = time.time()
-    print('total', time2-time1)
 
     pred_path = '../data/output/imdb_v1_out_2.txt'
     true_path = '../data/imdb/imdb_test_new_withlabel.txt'
