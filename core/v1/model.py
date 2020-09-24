@@ -16,14 +16,14 @@ class Model(torch.nn.Module):
         ...
         raise NotImplementedError
 
-    def load_dict(self, path):
+    def _load_dict(self, path):
         # path = '../data/cache/dict/dict.tempo'
         with open(path, 'r', encoding='utf-8') as f:
             dict_ = eval(f.read())
         return dict_
 
     def load_pretrained(self, dict_path, path, word_dim):
-        words_dict = self.load_dict(dict_path)
+        words_dict = self._load_dict(dict_path)
         vecs = np.random.normal(0.0, 0.9, [len(words_dict), word_dim])
         with open(path, 'r') as f:
             for line in f:

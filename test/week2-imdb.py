@@ -103,7 +103,7 @@ class RNNModel(Model):
 
         self.rnn = torch.nn.LSTM(word_dim, hidden_size, layer_num, batch_first=True, bidirectional=True)
         self.dropout = torch.nn.Dropout(0.5)
-        self.fc = torch.nn.Sequential(
+        self.fc = torch.nn.Sequential(  # full connection全联接层
             torch.nn.Linear(hidden_size * 2, output_num)
         )
         # self.fc = torch.nn.Linear(hidden_size, output_num)
